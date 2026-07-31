@@ -53,14 +53,14 @@ architecture — no emulation needed.
 ```sh
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t ghcr.io/<you>/sveltekit-shinyproxy-demo:0.1.0 \
+  -t ghcr.io/baldikacti/shinyproxy-sveltekit-demo:latest \
   --push .
 ```
 
 It also runs standalone, served from the root path, which is handy for a smoke test:
 
 ```sh
-docker run --rm -p 3000:3000 ghcr.io/<you>/sveltekit-shinyproxy-demo:0.1.0
+docker run --rm -p 3000:3000 ghcr.io/baldikacti/shinyproxy-sveltekit-demo:latest
 ```
 
 ### The sub-path problem
