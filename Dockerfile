@@ -1,12 +1,4 @@
 # syntax=docker/dockerfile:1.7
-#
-# Multi-arch image (linux/amd64 + linux/arm64) for running this SvelteKit app under ShinyProxy.
-#
-#   docker buildx build --platform linux/amd64,linux/arm64 -t <registry>/sveltekit-demo:0.1.0 --push .
-#
-# The builder stage runs on the *build* platform (no emulation) and the produced `build/` directory is
-# pure JavaScript - adapter-node bundles the dependencies - so the same output is valid on every
-# target architecture. Only the small runtime stage is built per architecture.
 ARG NODE_VERSION=22
 
 FROM --platform=$BUILDPLATFORM node:${NODE_VERSION}-alpine AS builder
@@ -44,7 +36,6 @@ ENV PROTOCOL_HEADER=x-forwarded-proto \
     ADDRESS_HEADER=x-forwarded-for \
     XFF_DEPTH=1
 
-# `node` owns the build output because the entrypoint rewrites it in place at start-up.
 COPY --from=builder --chown=node:node /app/build ./build
 COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
