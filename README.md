@@ -46,18 +46,12 @@ produces a standalone Node server in `build/` (`node build/index.js`).
 
 ### Build the image
 
-The image is multi-arch. The builder stage runs natively on the build machine and emits plain
-JavaScript (adapter-node bundles the dependencies), so only the thin runtime stage is built per
-architecture — no emulation needed.
-
 ```sh
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   -t ghcr.io/baldikacti/shinyproxy-sveltekit-demo:latest \
   --push .
 ```
-
-It also runs standalone, served from the root path, which is handy for a smoke test:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/baldikacti/shinyproxy-sveltekit-demo:latest
@@ -82,9 +76,6 @@ container-env:
   # ... and tell the app which sub-path it is being served on.
   SHINYPROXY_PUBLIC_PATH: "#{proxy.getRuntimeValue('SHINYPROXY_PUBLIC_PATH')}"
 ```
-
-Because the entrypoint rewrites files under `/app/build`, the container needs a writable filesystem
-(no `readOnlyRootFilesystem: true` in the pod security context).
 
 ### Environment variables
 

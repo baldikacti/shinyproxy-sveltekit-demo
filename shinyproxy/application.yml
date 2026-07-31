@@ -1,43 +1,24 @@
 # Example ShinyProxy configuration for this SvelteKit app.
-#
-# For the ShinyProxy Operator on Kubernetes, put the `proxy:` block below into the
-# `spec.configuration` of your ShinyProxy custom resource - the app spec itself is identical.
 proxy:
   title: Web framework testbed
   port: 8080
   container-backend: kubernetes
+  heartbeat-timeout: 60000
   kubernetes:
     namespace: shinyproxy
     internal-networking: true
-
-  authentication: simple
-  users:
-    - name: demo
-      password: demo
-      groups: [demo]
-
+  
   specs:
     - id: sveltekit-demo
       display-name: SvelteKit demo
       description: SvelteKit 2 / Svelte 5 demo app served by adapter-node
-      access-groups: [demo]
-
-      container-image: ghcr.io/<you>/sveltekit-shinyproxy-demo:0.1.0
-      # adapter-node listens on 3000, not on Shiny's default 3838.
+      container-image: ghcr.io/baldikacti/shinyproxy-sveltekit-demo:latest
       port: 3000
 
       # Forward the per-session sub-path to the container instead of stripping it, ...
       target-path: "#{proxy.getRuntimeValue('SHINYPROXY_PUBLIC_PATH')}"
       container-env:
-        # ... and tell the app what that sub-path is, so SvelteKit's `paths.base` matches it.
-        # The entrypoint rewrites the build output with this value at start-up.
         SHINYPROXY_PUBLIC_PATH: "#{proxy.getRuntimeValue('SHINYPROXY_PUBLIC_PATH')}"
 
         # SvelteKit rejects cross-origin form posts, so it has to know its own public origin.
-        # The image reads x-forwarded-proto / x-forwarded-host by default; set ORIGIN explicitly if
-        # your ingress does not send them (symptom: form actions return 403 "Cross-site POST").
         ORIGIN: "https://shinyproxy.example.com"
-
-      # The app has no websocket connection to keep the session alive; raise or disable the
-      # heartbeat timeout if idle sessions get reaped too eagerly.
-      heartbeat-timeout: 600000
